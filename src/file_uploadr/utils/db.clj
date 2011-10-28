@@ -1,12 +1,13 @@
 (ns file-uploadr.utils.db 
-  (:require [clojure.java.jdbc :as jdbc]))
+  (:require [file-uploadr.config :as conf]
+            [clojure.java.jdbc :as jdbc]))
 
 
 (def db {:classname "com.mysql.jdbc.Driver"
          :subprotocol "mysql"
-         :subname "//localhost:3306/uploadr"
-         :user "root"
-         :password "m0nk3Y"})
+         :subname (str "//" (:host conf/db) ":" (or (:port conf/db) 3306) "/" (:name conf/db))
+         :user (:user conf/db)
+         :password (:pass conf/db)})
 
 
 (defmacro with-db [& body]
