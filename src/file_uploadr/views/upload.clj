@@ -28,7 +28,7 @@
   (not (vali/errors?)))
 
 
-(pre-route "/upload*" {} (auth/login-required))
+(pre-route [:any "/upload*"] {} (auth/login-required))
 
 (defpartial form-error [[error]]
             [:div.error error])
