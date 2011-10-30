@@ -49,7 +49,10 @@
         (update! :photos document (merge document { :photo photo :thumb thumb })) photo-id))
 
 (defn latest-photos [page limit]
-    (fetch :photos :limit limit :skip (db/offset page limit)))
+    (fetch :photos 
+           :limit limit 
+           :skip (db/offset page limit) 
+           :sort { :created -1 } ))
 
 (defn page-count [page-size]
   (db/page-count (fetch-count :photos) page-size))
