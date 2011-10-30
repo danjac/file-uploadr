@@ -1,18 +1,13 @@
 (ns file-uploadr.server
   (:require [file-uploadr.middleware :as middleware]
-            [file-uploadr.config :as conf]
-            [noir.server :as server])
-  (:use somnium.congomongo))
+            [file-uploadr.utils.db :as db]
+            [noir.server :as server]))
 
 
 (server/add-middleware middleware/authenticate)
 (server/load-views "src/file_uploadr/views/")
 
-(def conn (make-connection (:name conf/db)
-                           {:host (or (:host conf/db) "127.0.0.1")}))
-
-(set-connection! conn)
-
+(db/connect)
 
 (defn -main [& m]
   (let [mode (keyword (or (first m) :dev))

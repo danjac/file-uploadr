@@ -1,55 +1,13 @@
 (ns file-uploadr.utils.db 
-  (:require [file-uploadr.config :as conf]
-            [clojure.java.jdbc :as jdbc]))
+  (:require [file-uploadr.config :as conf])
+  (:use somnium.congomongo))
+
+(def conn (make-connection (:name conf/db)
+                           {:host (or (:host conf/db) "127.0.0.1")}))
 
 
-(def db {:classname "com.mysql.jdbc.Driver"
-         :subprotocol "mysql"
-         :subname (str "//" (:host conf/db) ":" (or (:port conf/db) 3306) "/" (:name conf/db))
-         :user (:user conf/db)
-         :password (:pass conf/db)})
-
-
-(defmacro with-db [& body]
-  `(jdbc/with-connection db ~@body))
-
-
-(defn fetch-all [query]
-  "Returns results of query as vector"
-  (with-db
-    (jdbc/with-query-results res query
-                             (doall res))))
-
-
-
-(defn fetch-one [query]
-  "Returns results of first row only"
-  (first (fetch-all query)))
-  
-
-(defn fetch-result [query]
-  "Returns first column of first row"
-  (first (vals (fetch-one query))))
-  
-
-(defn insert! [tablename values]
-  (with-db
-    (:generated_key (first (jdbc/insert-records tablename values)))))
-
-
-(defn update! [tablename where values]
-  (with-db
-    (jdbc/update-values tablename where values)))
-
-
-(defn delete! [tablename where]
-  (with-db
-    (jdbc/delete-rows tablename where)))
-
-
-(defn create-table! [& args]
-  (with-db
-    (apply jdbc/create-table args)))
+(defn connect []
+  (set-connection! conn))
 
 
 (defn offset [page limit]
