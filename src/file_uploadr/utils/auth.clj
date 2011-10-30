@@ -6,7 +6,7 @@
 (defn current-user [] middleware/*current-user*)
 
 (defn user-id []
-  (:id (current-user)))
+  (user-id (current-user)))
 
 (defn username []
   (:name (current-user)))

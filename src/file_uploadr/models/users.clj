@@ -1,31 +1,23 @@
 (ns file-uploadr.models.users
-  (:require [file-uploadr.utils.db :as db]
-            [noir.util.crypt :as crypt]))
+  (:require [noir.util.crypt :as crypt])
+  (:use somnium.congomongo))
 
 
-(defn create-users! []
-  "Create users table"
-  (db/create-table!
-    :users
-    [:id :integer "PRIMARY KEY" "AUTO_INCREMENT"]
-    [:name "VARCHAR(50)" "UNIQUE"]
-    [:password "VARCHAR(60)"]
-    [:email "VARCHAR(150)" "UNIQUE"]
-    [:joined :timestamp]))
-
+(defn user-id [user]
+  "Create a printable user ID"
+  (str (:_id user)))
 
 (defn add-user! [name email password]
-  (db/insert! :users {:name name :email email :password (crypt/encrypt password)}))
-
-(defn delete-user! [user-id]
-  (db/delete! :users ["id=?" user-id]))
+  (insert! :users {:name name :email email :password (crypt/encrypt password)}))
 
 
 (defn get-user [user-id]
-  (db/fetch-one ["SELECT * FROM users WHERE id=?" user-id]))
+  (fetch-one :users :where {:_id (object-id user-id)}))
 
-(defn authenticate [login password]
-  (if-let [user (db/fetch-one ["SELECT * FROM users WHERE email=? OR name=?" login login])]
+
+(defn auth-user [login password]
+  (if-let [user (fetch-one :users :where {:$or [{:email login}
+                                                {:name login}]})]
     (if (crypt/compare password (:password user)) user)))
 
 

@@ -41,10 +41,10 @@
             [:img {:src url :title title :alt title :width width :height height}]))
 
 
-(defpartial show-photo [{:keys [id title thumb photo]}]
+(defpartial show-photo [{:keys [_id title thumb photo]}]
             [:div.photo.span-6 
              [:h3 title]
-             (show-thumbnail id title thumb)])
+             (show-thumbnail _id title thumb)])
 
 
 (defpage "/" []
@@ -70,9 +70,9 @@
 
 
 (defpage [:post "/login"] {:keys [login password]}
-         (if-let [user (users/authenticate login password)]
+         (if-let [user (users/auth-user login password)]
            (do 
-              (session/put! :user-id (:id user))
+              (session/put! :user-id (users/user-id user))
               (res/redirect "/"))
            (render "/login")))
 
@@ -108,7 +108,7 @@
          (if (valid-photo? photo)
            (do 
              (photos/add-photo! (:file photo)
-                                (auth/user-id) 
+                                (auth/current-user) 
                                 (:title photo) 
                                 (:description photo) 
                                 (:tags photo)) 
