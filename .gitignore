@@ -1,0 +1,10 @@
+pom.xml
+*jar
+/lib/
+/classes/
+/uploads/
+.lein-deps-sum
+.lein-failures
+
+config.clj
+
