@@ -1,20 +1,18 @@
 (ns file-uploadr.models.photos 
   (:require [file-uploadr.utils.db :as db]
             [file-uploadr.utils.image :as img]
+            [file-uploadr.config :as conf]
             [clojure.string :as string]
             [clojure.contrib.duck-streams :as ds])
   (:use somnium.congomongo))
 
 
-
-(def upload-path "resources/public/img/uploads")
-
 (defn gen-photo-path [photo-id photo]
-  (string/join "/" [upload-path "photos" (str photo-id) photo]))
+  (string/join "/" [conf/upload-path "photos" (str photo-id) photo]))
 
 
 (defn gen-thumb-path [photo-id thumb]
-  (string/join "/" [upload-path "thumbs" (str photo-id) thumb]))
+  (string/join "/" [conf/upload-path "thumbs" (str photo-id) thumb]))
 
 (defn gen-thumb-url [photo-id thumb]
   (string/join "/" ["/img" "uploads" "thumbs" (str photo-id) thumb]))
