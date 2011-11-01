@@ -2,7 +2,7 @@ pom.xml
 *jar
 /lib/
 /classes/
-/uploads/
+/resources/public/img/uploads/
 .lein-deps-sum
 .lein-failures
 
