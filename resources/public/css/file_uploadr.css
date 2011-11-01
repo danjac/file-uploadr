@@ -1,0 +1,12 @@
+body { font: 12pt "Helvetica Neue", "Lucida Grande", Arial, sans-serif; background-color: #ddd; }
+
+header { background-color: #000; color: #fff; padding: 3px; }
+header h1 { color: #aaa; }
+header a { text-decoration: none; color: #aaa; }
+header a:hover { color: #fff; }
+
+
+nav { text-align: right; }
+nav li { display: inline; margin-right: 30px; }
+
+div.photo { margin-bottom: 30px; width: 210px; float:left; }

@@ -7,9 +7,17 @@
            javax.imageio.ImageIO))
 
 
+(defn image-obj [path]
+  (javax.imageio.ImageIO/read (new File path)))
+
+
+(defn image-size-from-obj [image]
+  [(.getWidth image) 
+   (.getHeight image)])
+
+
 (defn image-size [path]
-  (let [image (javax.imageio.ImageIO/read (new File path))]
-    [(.getWidth image) (.getHeight image)]))
+  (image-size-from-obj (image-obj path)))
 
 
 (defn get-thumbnail-dimensions [image-width image-height thumb-width thumb-height]
@@ -47,9 +55,8 @@
     
 
 (defn create-thumbnail [image-path thumb-path thumb-width thumb-height]
-  (let [image (javax.imageio.ImageIO/read (new File image-path))
-        image-width (.getWidth image)
-        image-height (.getHeight image)
+  (let [image (image-obj image-path)
+        [image-width image-height] (image-size-from-obj image)
         [thumb-width thumb-height] (get-thumbnail-dimensions image-width 
                                                              image-height 
                                                              thumb-width 

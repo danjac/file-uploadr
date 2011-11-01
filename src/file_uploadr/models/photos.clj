@@ -7,15 +7,25 @@
   (:use somnium.congomongo))
 
 
-(defn gen-photo-path [photo-id photo]
-  (string/join "/" [conf/upload-path "photos" (str photo-id) photo]))
+(defn photo-filename [photo-id]
+  (str photo-id ".jpg"))
+
+(defn thumb-filename [photo-id]
+  (str "tn-" photo-id ".jpg"))
+
+(defn gen-photo-path [photo-id]
+  (string/join "/" [conf/upload-path "photos" (photo-filename photo-id)]))
 
 
-(defn gen-thumb-path [photo-id thumb]
-  (string/join "/" [conf/upload-path "thumbs" (str photo-id) thumb]))
+(defn gen-thumb-path [photo-id]
+  (string/join "/" [conf/upload-path "thumbs" (thumb-filename photo-id)]))
 
-(defn gen-thumb-url [photo-id thumb]
-  (string/join "/" ["/img" "uploads" "thumbs" (str photo-id) thumb]))
+
+(defn gen-photo-url [photo-id]
+  (string/join "/" ["/img" "uploads" "photos" (photo-filename photo-id)]))
+
+(defn gen-thumb-url [photo-id]
+  (string/join "/" ["/img" "uploads" "thumbs" (thumb-filename photo-id)]))
 
 
 (defn add-photo! [uploaded-file user title description tags]
@@ -28,11 +38,10 @@
                                    :description description
                                    :tags tags
                                    :photo photo
-                                   :created created
-                                   :thumb thumb})
+                                   :created created})
         photo-id (str (:_id document))
-        photo-path (gen-photo-path photo-id photo)
-        thumb-path (gen-thumb-path photo-id thumb)
+        photo-path (gen-photo-path photo-id)
+        thumb-path (gen-thumb-path photo-id)
         photo-file (ds/file-str photo-path)
         thumb-file (ds/file-str thumb-path)]
 
@@ -43,8 +52,12 @@
         ; create thumbnail
         (ds/copy (:tempfile uploaded-file) photo-file)
         (img/create-thumbnail photo-path thumb-path 200 200)
+        (img/create-thumbnail photo-path photo-path 1000 1000)
 
-        (update! :photos document (merge document { :photo photo :thumb thumb })) photo-id))
+        photo-id))
+
+(defn get-photo [photo-id]
+  (fetch-one :photos :where {:_id (object-id photo-id)}))
 
 (defn latest-photos [page limit]
     (fetch :photos 
@@ -52,5 +65,4 @@
            :skip (db/offset page limit) 
            :sort { :created -1 } ))
 
-(defn page-count [page-size]
-  (db/page-count (fetch-count :photos) page-size))
+(defn count-photos [] (fetch-count :photos))
