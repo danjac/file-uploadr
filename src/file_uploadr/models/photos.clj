@@ -28,6 +28,38 @@
   (string/join "/" ["/img" "uploads" "thumbs" (thumb-filename photo-id)]))
 
 
+(defn taglist [tags] (string/split tags #" "))
+
+
+(def tag-cloud-map-fn 
+  "
+  function() {
+    if (!this.tags) {
+      return;
+    }
+    
+    for (index in this.tags) {
+      emit(this.tags[index], 1);
+    }
+  }
+  ")
+
+(def tag-cloud-reduce-fn
+  "
+  function(previous, current) {
+    var count = 0;
+    for (index in current){
+      count += current[index];
+    }
+    return count;
+  }
+  ")
+
+(defn tag-cloud []
+  (map-reduce :photos tag-cloud-map-fn tag-cloud-reduce-fn :tags)
+  (shuffle (fetch :tags)))
+
+
 (defn add-photo! [uploaded-file user title description tags]
   (let [photo (:filename uploaded-file)
         thumb (str "tn-" photo)
@@ -36,7 +68,7 @@
                                    :author-id (:_id user)
                                    :title title
                                    :description description
-                                   :tags tags
+                                   :tags (taglist tags)
                                    :photo photo
                                    :created created})
         photo-id (str (:_id document))
@@ -64,5 +96,9 @@
            :limit limit 
            :skip (db/offset page limit) 
            :sort { :created -1 } ))
+
+
+(defn photos-by-tag [tag]
+  (fetch :photos :where {:tags tag}))
 
 (defn count-photos [] (fetch-count :photos))

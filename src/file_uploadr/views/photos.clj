@@ -56,7 +56,16 @@
                    (show-clear index 4)])))
 
 
+(defpartial render-tag [tag]
+            (link-to {:class "tag"} (str "/tag/" tag) tag) "&nbsp;")
 
+
+(defpartial tag-cloud []
+            [:div.tag-cloud.span-12.append-5
+             (for [{:keys [_id value]} (photos/tag-cloud)]
+               (link-to {:class (str "tag tag-" (int value))} (str "/tag/" _id) _id))])
+
+               
 (defpage "/" {:keys [page]}
          (let [page-size 8
                curpage (to-int page 1)]
@@ -64,10 +73,19 @@
              [:h2 "Latest photos"]
              (map-indexed show-photo (photos/latest-photos curpage page-size))
              [:div.clear]
-             (common/paginate (fn [page] (url "/" {:page page})) curpage page-size (photos/count-photos)))))
+             (common/paginate (fn [page] (url "/" {:page page})) curpage page-size (photos/count-photos))
+             (tag-cloud))))
+
+
              
 
  
+(defpage "/tag/:tag" {:keys [tag]}
+         (common/layout 
+           [:h2 "Photos for tag " tag]
+           (map-indexed show-photo (photos/photos-by-tag tag))
+           [:div.clear]))
+           
 
 (defpage "/upload"  {:keys [title description tags]}
            (common/layout
@@ -118,8 +136,8 @@
                       :height height
                       :title title
                       :alt title}]]
-               [:p description]
-               [:p tags]))))
+               [:p.description description]
+               [:p.tags (map render-tag tags)]))))
 
 
 

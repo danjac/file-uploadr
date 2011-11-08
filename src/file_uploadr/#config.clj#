@@ -1,9 +1,0 @@
-(ns file-uploadr.config)
-
-(def db {:name "uploadr" 
-         :host "localhost" })
-
-
-(def upload-path "resources/public/img/uploads")
-
-
